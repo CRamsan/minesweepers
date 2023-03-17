@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 
+import com.myapplication.common.Game
+import com.myapplication.common.MainView
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
