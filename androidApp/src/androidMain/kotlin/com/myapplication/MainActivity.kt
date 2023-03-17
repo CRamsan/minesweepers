@@ -1,26 +1,33 @@
 package com.myapplication
 
-import Game
-import MainView
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val game = Game(Random)
-        game.setParameters(10, 10, 10)
+        val game = Game()
+        game.setParameters()
 
         setContent {
-            val map by remember { game.mapState }
-            MainView(map) { column, row ->
-                game.selectPosition(column, row)
-            }
+            val map by remember { game.gameStateHolder.map }
+            val time by remember { game.gameStateHolder.time }
+            val minesRemaining by remember { game.gameStateHolder.minesRemaining }
+            val gameState by remember { game.gameStateHolder.gameState }
+
+            MainView(
+                time,
+                minesRemaining,
+                map,
+                gameState,
+                { column, row -> game.selectPosition(column, row) },
+                { column, row -> game.toggleTileAtPosition(column, row) },
+                { game.setParameters() },
+            )
         }
     }
 }
