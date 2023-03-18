@@ -1,12 +1,10 @@
 package com.myapplication.common
 
 import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.random.Random
 
+@OptIn(DelicateCoroutinesApi::class)
 class Game {
 
     private lateinit var random: Random
@@ -51,7 +49,7 @@ class Game {
         updateState()
     }
 
-    private fun initializeMap(column: Int, row: Int) {
+    private fun initializeMap(initialColumn: Int, initialRow: Int) {
         repeat(mines) {
             var randomX: Int
             var randomY: Int
@@ -61,7 +59,7 @@ class Game {
                 randomY = random.nextInt(rows)
 
                 val mineAlreadyInPlace = _map[randomY][randomX].tileType == TileType.BOMB
-                val isInitialPosition = randomY == row && randomX == column
+                val isInitialPosition = randomY == initialRow && randomX == initialColumn
 
                 val isPositionAvailable = !mineAlreadyInPlace && !isInitialPosition
 
@@ -114,8 +112,8 @@ class Game {
         }
     }
 
-    private fun loseGame(column: Int, row: Int) {
-        val userSelectionTile = _map[row][column]
+    private fun loseGame(targetColumn: Int, targetRow: Int) {
+        val userSelectionTile = _map[targetRow][targetColumn]
         isRunning = false
         repeat(rows) { row ->
             repeat(columns) { column ->

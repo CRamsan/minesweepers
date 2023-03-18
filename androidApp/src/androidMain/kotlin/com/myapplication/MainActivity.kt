@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import com.myapplication.common.Assets
 
 import com.myapplication.common.Game
 import com.myapplication.common.MainView
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
                 minesRemaining,
                 map,
                 gameState,
+                Assets(resources),
                 { column, row -> game.selectPosition(column, row) },
                 { column, row -> game.toggleTileAtPosition(column, row) },
                 { game.setParameters() },

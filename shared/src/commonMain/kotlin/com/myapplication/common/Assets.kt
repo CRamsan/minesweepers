@@ -2,7 +2,7 @@ package com.myapplication.common
 
 import androidx.compose.ui.graphics.ImageBitmap
 
-expect object Assets {
+expect class Assets {
 
     val lcdNumberDash: ImageBitmap
 

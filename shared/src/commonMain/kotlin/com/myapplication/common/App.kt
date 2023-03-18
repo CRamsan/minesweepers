@@ -18,6 +18,7 @@ internal fun App(
     minesRemaining: Int,
     map: List<List<Tile>>,
     gameState: Game.GameState,
+    assets: Assets,
     onTileSelected: (column: Int, row: Int) -> Unit,
     onTileSelectedSecondary: (column: Int, row: Int) -> Unit,
     onRestartSelected: () -> Unit,
@@ -28,7 +29,7 @@ internal fun App(
         Row(
             modifier = Modifier.background(Color(0xFFC6C6C6))
         ) {
-            minesRemainingDisplay(minesRemaining)
+            minesRemainingDisplay(minesRemaining, assets)
             Spacer(Modifier.weight(1f))
 
             val interactionSource = remember { MutableInteractionSource() }
@@ -36,10 +37,11 @@ internal fun App(
                 gameState.toFaceButtonState(),
                 isTilePressed,
                 interactionSource,
+                assets,
             ) { onRestartSelected() }
 
             Spacer(Modifier.weight(1f))
-            timePlayed(time)
+            timePlayed(time, assets)
         }
         map.forEachIndexed { rowIndex, row ->
             Row {
@@ -48,6 +50,7 @@ internal fun App(
                         tile,
                         columnIndex,
                         rowIndex,
+                        assets,
                         onTileSelected,
                         onTileSelectedSecondary
                     ) {
@@ -69,6 +72,7 @@ internal expect fun FaceButton(
     faceButtonState: FaceButtonState,
     isTilePressed: Boolean,
     mutableInteractionSource: MutableInteractionSource,
+    assets: Assets,
     onRestartSelected: () -> Unit
 )
 internal enum class FaceButtonState {
@@ -79,48 +83,51 @@ internal enum class FaceButtonState {
     WORRIED,
 }
 
-internal fun FaceButtonState.toImageBitmap(): ImageBitmap = when(this) {
-    FaceButtonState.NORMAL -> Assets.buttonNormal
-    FaceButtonState.DEAD -> Assets.buttonDead
-    FaceButtonState.PRESSED -> Assets.buttonPressed
-    FaceButtonState.WON -> Assets.buttonWon
-    FaceButtonState.WORRIED -> Assets.buttonWorried
+internal fun FaceButtonState.toImageBitmap(assets: Assets): ImageBitmap = when(this) {
+    FaceButtonState.NORMAL -> assets.buttonNormal
+    FaceButtonState.DEAD -> assets.buttonDead
+    FaceButtonState.PRESSED -> assets.buttonPressed
+    FaceButtonState.WON -> assets.buttonWon
+    FaceButtonState.WORRIED -> assets.buttonWorried
 }
 
 @Composable
 internal fun minesRemainingDisplay(
     minesRemaining: Int,
+    assets: Assets,
 ) {
-    lcdDisplay(3, minesRemaining)
+    lcdDisplay(3, minesRemaining, assets)
 }
 
 @Composable
 internal fun timePlayed(
     time: Int,
+    assets: Assets,
 ) {
-    lcdDisplay(3, time)
+    lcdDisplay(3, time, assets)
 }
 
 @Composable
 private fun lcdDisplay(
     digits: Int,
     value: Int,
+    assets: Assets,
 ) {
     Row {
         repeat(digits) {
             val digit = value.toString().padStart(digits)[it].digitToIntOrNull()
             val imageBitmap = when(digit) {
-                0 -> Assets.lcdNumberZero
-                1 -> Assets.lcdNumberOne
-                2 -> Assets.lcdNumberTwo
-                3 -> Assets.lcdNumberThree
-                4 -> Assets.lcdNumberFour
-                5 -> Assets.lcdNumberFive
-                6 -> Assets.lcdNumberSix
-                7 -> Assets.lcdNumberSeven
-                8 -> Assets.lcdNumberEight
-                9 -> Assets.lcdNumberNine
-                else -> Assets.lcdNumberNone
+                0 -> assets.lcdNumberZero
+                1 -> assets.lcdNumberOne
+                2 -> assets.lcdNumberTwo
+                3 -> assets.lcdNumberThree
+                4 -> assets.lcdNumberFour
+                5 -> assets.lcdNumberFive
+                6 -> assets.lcdNumberSix
+                7 -> assets.lcdNumberSeven
+                8 -> assets.lcdNumberEight
+                9 -> assets.lcdNumberNine
+                else -> assets.lcdNumberNone
             }
             Image(
                 imageBitmap,
@@ -136,6 +143,7 @@ internal fun TileButton(
     tile: Tile,
     column: Int,
     row: Int,
+    assets: Assets,
     onTileSelected: (column: Int, row: Int) -> Unit,
     onTileSelectedSecondary: (column: Int, row: Int) -> Unit,
     onPressed: (isPressed: Boolean) -> Unit,
@@ -144,24 +152,24 @@ internal fun TileButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val imageBitmap = when (tile.coverMode) {
-        CoverMode.COVERED -> Assets.tile
-        CoverMode.FLAGGED -> Assets.tileFlagged
+        CoverMode.COVERED -> assets.tile
+        CoverMode.FLAGGED -> assets.tileFlagged
         CoverMode.UNCOVERED -> when (tile) {
             is Tile.Adjacent -> when (tile.risk) {
-                1 -> Assets.pressedTileOne
-                2 -> Assets.pressedTileTwo
-                3 -> Assets.pressedTileThree
-                4 -> Assets.pressedTileFour
-                5 -> Assets.pressedTileFive
-                6 -> Assets.pressedTileSix
-                7 -> Assets.pressedTileSeven
-                8 -> Assets.pressedTileEight
-                else -> Assets.pressedTileEight
+                1 -> assets.pressedTileOne
+                2 -> assets.pressedTileTwo
+                3 -> assets.pressedTileThree
+                4 -> assets.pressedTileFour
+                5 -> assets.pressedTileFive
+                6 -> assets.pressedTileSix
+                7 -> assets.pressedTileSeven
+                8 -> assets.pressedTileEight
+                else -> assets.pressedTileEight
             }
-            is Tile.Empty -> Assets.pressedTile
+            is Tile.Empty -> assets.pressedTile
             is Tile.Bomb -> when (tile.userSelection) {
-                true -> Assets.pressedTileBombRed
-                false -> Assets.pressedTileBomb
+                true -> assets.pressedTileBombRed
+                false -> assets.pressedTileBomb
             }
         }
     }

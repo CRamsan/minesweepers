@@ -38,7 +38,8 @@ internal actual fun FaceButton(
     faceButtonState: FaceButtonState,
     isTilePressed: Boolean,
     mutableInteractionSource: MutableInteractionSource,
-    onRestartSelected: () -> Unit
+    assets: Assets,
+    onRestartSelected: () -> Unit,
 ) {
     val isPressed by mutableInteractionSource.collectIsPressedAsState()
 
@@ -53,7 +54,7 @@ internal actual fun FaceButton(
     }
 
     Image(
-        coalescedState.toImageBitmap(),
+        coalescedState.toImageBitmap(assets),
         contentDescription = "",
         modifier = Modifier.clickable { onRestartSelected() }
     )

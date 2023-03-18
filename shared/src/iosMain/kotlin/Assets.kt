@@ -1,13 +1,9 @@
-package com.myapplication.common
-
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 
 actual class Assets {
 
-    actual val lcdNumberDash by lazy { useResource("dash.png", ::loadImageBitmap) }
+    actual val lcdNumberDash: ImageBitmap by lazy { useResource("dash.png", ::loadImageBitmap) }
 
     actual val lcdNumberNone by lazy { useResource("none.png", ::loadImageBitmap) }
 

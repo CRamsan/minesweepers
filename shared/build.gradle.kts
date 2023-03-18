@@ -1,5 +1,7 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.cli.jvm.main
+
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
@@ -61,9 +63,8 @@ kotlin {
 
 android {
     compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+
+    sourceSets["main"].assets.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         minSdk = 26
