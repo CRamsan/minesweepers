@@ -3,11 +3,11 @@ package com.myapplication
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import com.myapplication.common.Assets
 
-import com.myapplication.common.Game
+import com.myapplication.common.game.Game
 import com.myapplication.common.MainView
 
 class MainActivity : AppCompatActivity() {
@@ -18,17 +18,16 @@ class MainActivity : AppCompatActivity() {
         game.setParameters()
 
         setContent {
-            val map by remember { game.gameStateHolder.map }
-            val time by remember { game.gameStateHolder.time }
-            val minesRemaining by remember { game.gameStateHolder.minesRemaining }
-            val gameState by remember { game.gameStateHolder.gameState }
+            val map by game.gameStateHolder.map.collectAsState()
+            val time by game.gameStateHolder.time.collectAsState()
+            val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
+            val gameState by game.gameStateHolder.gameState.collectAsState()
 
             MainView(
                 time,
                 minesRemaining,
                 map,
                 gameState,
-                Assets(resources),
                 { column, row -> game.selectPosition(column, row) },
                 { column, row -> game.toggleTileAtPosition(column, row) },
                 { game.setParameters() },

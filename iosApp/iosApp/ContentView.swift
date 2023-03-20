@@ -4,8 +4,8 @@ import shared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        var game = Game()
-        game.setParameters(columns: 10, rows: 10, mines: 10)
+        let game = Game()
+        game.setParameters()
         return Main_iosKt.MainViewController(game: game)
     }
 
