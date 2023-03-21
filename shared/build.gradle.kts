@@ -1,7 +1,5 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
-import org.jetbrains.kotlin.cli.jvm.main
-
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
@@ -14,7 +12,13 @@ version = "1.0-SNAPSHOT"
 kotlin {
     android()
 
-    jvm("desktop")
+    jvm("desktop") {
+        compilations.all {
+            compilerOptions.configure {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            }
+        }
+    }
 
     ios()
     iosSimulatorArm64()
@@ -25,7 +29,7 @@ kotlin {
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
         framework {
-            baseName = "shared"
+            baseName = "Shared"
             isStatic = true
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
@@ -46,7 +50,7 @@ kotlin {
                 implementation("androidx.activity:activity-compose:1.6.1")
                 implementation("androidx.appcompat:appcompat:1.6.1")
                 implementation("androidx.core:core-ktx:1.9.0")
-                implementation("io.coil-kt:coil-compose:2.2.2")
+                implementation(compose.desktop.common)
             }
         }
         val iosMain by getting
@@ -64,7 +68,7 @@ kotlin {
 android {
     compileSdk = 33
 
-    sourceSets["main"].assets.srcDirs("src/commonMain/resources")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         minSdk = 26
@@ -74,4 +78,5 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    namespace = "com.myapplication.common"
 }

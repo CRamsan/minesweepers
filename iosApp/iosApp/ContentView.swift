@@ -1,12 +1,12 @@
 import UIKit
 import SwiftUI
-import shared
+import Shared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         let game = Game()
         game.setParameters()
-        return Main_iosKt.MainViewController(game: game)
+        return GameViewControllerKt.MainViewController(game: game)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

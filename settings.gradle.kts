@@ -20,7 +20,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "My application"
+rootProject.name = "Minesweepers"
 
 include(":androidApp")
 include(":shared")
