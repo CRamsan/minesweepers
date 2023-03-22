@@ -12,14 +12,17 @@ fun MainViewController(game: Game) = ComposeUIViewController {
     val time by game.gameStateHolder.time.collectAsState()
     val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
     val gameState by game.gameStateHolder.gameState.collectAsState()
+    val isGameReady by game.isGameReady.collectAsState()
 
-    App(
-        time,
-        minesRemaining,
-        map,
-        gameState,
-        { column, row -> game.selectPosition(column, row) },
-        { column, row -> game.toggleTileAtPosition(column, row) },
-        { game.setParameters() },
-    )
+    if (isGameReady) {
+        App(
+            time,
+            minesRemaining,
+            map,
+            gameState,
+            { column, row -> game.selectPosition(column, row) },
+            { column, row -> game.toggleTileAtPosition(column, row) },
+            { game.setParameters() },
+        )
+    }
 }

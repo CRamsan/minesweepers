@@ -1,7 +1,9 @@
 package com.cramsan.minesweepers.common.game
 
+import com.cramsan.minesweepers.common.ui.Assets
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlin.random.Random
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -17,6 +19,8 @@ class Game {
         MutableStateFlow(GameState.NORMAL)
     )
     val gameStateHolder: GameStateHolder = _gameStateHolder
+    private val _isGameReady = MutableStateFlow(false)
+    val isGameReady = _isGameReady.asStateFlow()
 
     private var timerJob: Job? = null
 
@@ -30,23 +34,32 @@ class Game {
     fun setParameters() {
         this.columns = 15
         this.rows = 15
-        this.mines = 5
+        this.mines = 25
         this.random = Random
 
         firstSelection = true
         isRunning = false
+        timerJob?.cancel()
 
         _map.clear()
         repeat(rows) {
             val row = mutableListOf<Tile>()
             repeat(columns) {
-                row.add(Tile.Empty(CoverMode.COVERED))
+                row.add(Tile.Empty(TileCoverMode.COVERED))
             }
             _map.add(row)
         }
         _gameStateHolder.minesRemaining.value = mines
         _gameStateHolder.gameState.value = GameState.NORMAL
+        _gameStateHolder.time.value = 0
         updateState()
+    }
+
+    fun loadAssets() {
+        GlobalScope.launch {
+            Assets.loadAssets()
+            _isGameReady.value = true
+        }
     }
 
     private fun initializeMap(initialColumn: Int, initialRow: Int) {
@@ -64,7 +77,7 @@ class Game {
                 val isPositionAvailable = !mineAlreadyInPlace && !isInitialPosition
 
                 if (isPositionAvailable) {
-                    _map[randomY][randomX] = Tile.Bomb(CoverMode.COVERED)
+                    _map[randomY][randomX] = Tile.Bomb(TileCoverMode.COVERED)
                     break
                 }
             }
@@ -108,19 +121,20 @@ class Game {
         ).count { it.tileType == TileType.BOMB }
 
         if (adjacentBombs > 0) {
-            _map[row][column] = Tile.Adjacent(adjacentBombs, CoverMode.COVERED)
+            _map[row][column] = Tile.Adjacent(adjacentBombs, TileCoverMode.COVERED)
         }
     }
 
     private fun loseGame(targetColumn: Int, targetRow: Int) {
         val userSelectionTile = _map[targetRow][targetColumn]
         isRunning = false
+        timerJob?.cancel()
         repeat(rows) { row ->
             repeat(columns) { column ->
                 val bombTile = _map[row][column] as? Tile.Bomb
                 if (bombTile != null) {
                     _map[row][column] = bombTile.copy(
-                        coverMode = CoverMode.UNCOVERED,
+                        coverMode = TileCoverMode.UNCOVERED,
                         userSelection = bombTile === userSelectionTile,
                     )
                 }
@@ -131,6 +145,7 @@ class Game {
 
     private fun winGame() {
         isRunning = false
+        timerJob?.cancel()
         _gameStateHolder.gameState.value = GameState.WON
         _gameStateHolder.minesRemaining.value = 0
     }
@@ -138,14 +153,14 @@ class Game {
     private fun uncoverPosition(column: Int, row: Int) {
         val currentTile = _map.getOrNull(row)?.getOrNull(column) ?: return
 
-        if (currentTile.coverMode == CoverMode.UNCOVERED) {
+        if (currentTile.coverMode == TileCoverMode.UNCOVERED) {
             return
         }
 
         _map[row][column] = when(currentTile) {
             is Tile.Bomb -> return
-            is Tile.Adjacent,  -> Tile.Adjacent(currentTile.risk, CoverMode.UNCOVERED)
-            is Tile.Empty -> Tile.Empty(CoverMode.UNCOVERED)
+            is Tile.Adjacent,  -> Tile.Adjacent(currentTile.risk, TileCoverMode.UNCOVERED)
+            is Tile.Empty -> Tile.Empty(TileCoverMode.UNCOVERED)
         }
 
         if (currentTile !is Tile.Empty) {
@@ -183,7 +198,7 @@ class Game {
         var remainingTiles = 0
         repeat(rows) { row ->
             repeat(columns) { column ->
-                if (_map[row][column].coverMode != CoverMode.UNCOVERED) {
+                if (_map[row][column].coverMode != TileCoverMode.UNCOVERED) {
                     remainingTiles++
                 }
             }
@@ -203,12 +218,12 @@ class Game {
 
         val tile = _map[row][column]
         val nextCoverMode = when (tile.coverMode) {
-            CoverMode.COVERED -> CoverMode.FLAGGED
-            CoverMode.FLAGGED -> CoverMode.COVERED
-            CoverMode.UNCOVERED -> return
+            TileCoverMode.COVERED -> TileCoverMode.FLAGGED
+            TileCoverMode.FLAGGED -> TileCoverMode.COVERED
+            TileCoverMode.UNCOVERED -> return
         }
 
-        if (nextCoverMode == CoverMode.FLAGGED) {
+        if (nextCoverMode == TileCoverMode.FLAGGED) {
             if (_gameStateHolder.minesRemaining.value <= 0) {
                 return
             }

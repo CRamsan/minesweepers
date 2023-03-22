@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal actual fun TileButtonDrawable(
     image: ImageBitmap,
-    mutableInteractionSource: MutableInteractionSource,
     onTileSelected: () -> Unit,
     onTileSelectedSecondary: () -> Unit
 ) {
@@ -25,10 +24,7 @@ internal actual fun TileButtonDrawable(
         image,
         modifier = Modifier
             .size(20.dp)
-            .background(Color.Green)
             .combinedClickable(
-                mutableInteractionSource,
-                null,
                 onLongClick = { onTileSelectedSecondary() }
             ) { onTileSelected() },
         contentDescription = null,

@@ -5,6 +5,7 @@ import Shared
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         let game = Game()
+        game.loadAssets()
         game.setParameters()
         return GameViewControllerKt.MainViewController(game: game)
     }

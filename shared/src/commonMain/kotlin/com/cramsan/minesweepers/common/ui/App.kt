@@ -2,19 +2,22 @@ package com.cramsan.minesweepers.common.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
-import com.cramsan.minesweepers.common.game.CoverMode
+import androidx.compose.ui.unit.dp
+import com.cramsan.minesweepers.common.game.TileCoverMode
 import com.cramsan.minesweepers.common.game.Game
 import com.cramsan.minesweepers.common.game.Tile
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
 internal fun App(
@@ -26,34 +29,46 @@ internal fun App(
     onTileSelectedSecondary: (column: Int, row: Int) -> Unit,
     onRestartSelected: () -> Unit,
 ) {
-    var isTilePressed by remember { mutableStateOf(false) }
-
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
-            modifier = Modifier.background(Color(0xFFC6C6C6))
+            modifier = Modifier
+                .wrapContentHeight()
+                .background(Color(0xFFC6C6C6))
+                .border(3.dp, Color.Black)
+                .padding(Padding.SMALL)
         ) {
             minesRemainingDisplay(minesRemaining)
             Spacer(Modifier.weight(1f))
 
             ResetButton(
                 gameState.toFaceButtonState(),
-                isTilePressed,
             ) { onRestartSelected() }
 
             Spacer(Modifier.weight(1f))
             timePlayed(time)
         }
-        map.forEachIndexed { rowIndex, row ->
-            Row {
-                row.forEachIndexed { columnIndex, tile ->
-                    TileButton(
-                        tile,
-                        columnIndex,
-                        rowIndex,
-                        onTileSelected,
-                        onTileSelectedSecondary
-                    ) {
-                        isTilePressed = it
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                modifier = Modifier
+                    .border(3.dp, Color.Black)
+            ) {
+
+                map.forEachIndexed { rowIndex, row ->
+                    Row {
+                        row.forEachIndexed { columnIndex, tile ->
+                            TileButton(
+                                tile,
+                                columnIndex,
+                                rowIndex,
+                                onTileSelected,
+                                onTileSelectedSecondary
+                            )
+                        }
                     }
                 }
             }
@@ -72,13 +87,11 @@ internal enum class FaceButtonState {
     DEAD,
     PRESSED,
     WON,
-    WORRIED,
 }
 
 @Composable
 internal fun ResetButton(
     faceButtonState: FaceButtonState,
-    isTilePressed: Boolean,
     onRestartSelected: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -88,16 +101,18 @@ internal fun ResetButton(
         faceButtonState
     } else if (isPressed) {
         FaceButtonState.PRESSED
-    } else if (isTilePressed) {
-        FaceButtonState.WORRIED
     } else {
         faceButtonState
     }
 
+    println(coalescedState)
     Image(
         coalescedState.toImageBitmap(),
         contentDescription = "",
-        modifier = Modifier.clickable { onRestartSelected() }
+        filterQuality = FilterQuality.None,
+        modifier = Modifier
+            .size(Dimensions.BUTTON_SIZE)
+            .clickable { onRestartSelected() }
     )
 }
 
@@ -107,7 +122,6 @@ private fun FaceButtonState.toImageBitmap(): ImageBitmap = when(this) {
     FaceButtonState.DEAD -> Assets.buttonDead()
     FaceButtonState.PRESSED -> Assets.buttonPressed()
     FaceButtonState.WON -> Assets.buttonWon()
-    FaceButtonState.WORRIED -> Assets.buttonWorried()
 }
 
 
@@ -148,12 +162,15 @@ private fun lcdDisplay(
             }
             Image(
                 imageBitmap,
-                contentDescription = digit.toString()
+                contentDescription = digit.toString(),
+                filterQuality = FilterQuality.None,
+                modifier = Modifier.size(Dimensions.LCD_WIDTH, Dimensions.LCD_HEIGHT),
             )
         }
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun TileButton(
     tile: Tile,
@@ -161,15 +178,11 @@ internal fun TileButton(
     row: Int,
     onTileSelected: (column: Int, row: Int) -> Unit,
     onTileSelectedSecondary: (column: Int, row: Int) -> Unit,
-    onPressed: (isPressed: Boolean) -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
     val imageBitmap = when (tile.coverMode) {
-        CoverMode.COVERED -> Assets.tile()
-        CoverMode.FLAGGED -> Assets.tileFlagged()
-        CoverMode.UNCOVERED -> when (tile) {
+        TileCoverMode.COVERED -> Assets.tile()
+        TileCoverMode.FLAGGED -> Assets.tileFlagged()
+        TileCoverMode.UNCOVERED -> when (tile) {
             is Tile.Adjacent -> when (tile.risk) {
                 1 -> Assets.pressedTileOne()
                 2 -> Assets.pressedTileTwo()
@@ -189,11 +202,8 @@ internal fun TileButton(
         }
     }
 
-    onPressed(isPressed)
-
     TileButtonDrawable(
         imageBitmap,
-        interactionSource,
         { onTileSelected(column, row) },
     ) { onTileSelectedSecondary(column, row) }
 }

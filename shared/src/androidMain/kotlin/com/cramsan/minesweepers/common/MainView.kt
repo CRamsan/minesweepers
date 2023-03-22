@@ -2,7 +2,7 @@ package com.cramsan.minesweepers.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.cramsan.minesweepers.common.game.CoverMode
+import com.cramsan.minesweepers.common.game.TileCoverMode
 import com.cramsan.minesweepers.common.game.Game
 import com.cramsan.minesweepers.common.game.Tile
 import com.cramsan.minesweepers.common.ui.App
@@ -23,8 +23,8 @@ import com.cramsan.minesweepers.common.ui.App
 @Composable
 fun AppPreview() {
     App(20, 5, listOf(
-        listOf(Tile.Empty(CoverMode.COVERED), Tile.Empty(CoverMode.UNCOVERED), Tile.Empty(CoverMode.COVERED)),
-        listOf(Tile.Bomb(CoverMode.COVERED), Tile.Bomb(CoverMode.FLAGGED), Tile.Bomb(CoverMode.COVERED)),
-        listOf(Tile.Adjacent(1, CoverMode.UNCOVERED), Tile.Adjacent(2, CoverMode.UNCOVERED), Tile.Adjacent(3, CoverMode.COVERED)),
+        listOf(Tile.Empty(TileCoverMode.COVERED), Tile.Empty(TileCoverMode.UNCOVERED), Tile.Empty(TileCoverMode.COVERED)),
+        listOf(Tile.Bomb(TileCoverMode.COVERED), Tile.Bomb(TileCoverMode.FLAGGED), Tile.Bomb(TileCoverMode.COVERED)),
+        listOf(Tile.Adjacent(1, TileCoverMode.UNCOVERED), Tile.Adjacent(2, TileCoverMode.UNCOVERED), Tile.Adjacent(3, TileCoverMode.COVERED)),
     ), Game.GameState.WON, { _, _ -> }, { _, _ -> }, {})
 }

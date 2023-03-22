@@ -15,22 +15,26 @@ class MainActivity : AppCompatActivity() {
 
         val game = Game()
         game.setParameters()
+        game.loadAssets()
 
         setContent {
             val map by game.gameStateHolder.map.collectAsState()
             val time by game.gameStateHolder.time.collectAsState()
             val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
             val gameState by game.gameStateHolder.gameState.collectAsState()
+            val isGameReady by game.isGameReady.collectAsState()
 
-            MainView(
-                time,
-                minesRemaining,
-                map,
-                gameState,
-                { column, row -> game.selectPosition(column, row) },
-                { column, row -> game.toggleTileAtPosition(column, row) },
-                { game.setParameters() },
-            )
+            if (isGameReady) {
+                MainView(
+                    time,
+                    minesRemaining,
+                    map,
+                    gameState,
+                    { column, row -> game.selectPosition(column, row) },
+                    { column, row -> game.toggleTileAtPosition(column, row) },
+                    { game.setParameters() },
+                )
+            }
         }
     }
 }
