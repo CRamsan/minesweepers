@@ -1,12 +1,14 @@
 package com.cramsan.minesweepers.common.game
 
 import com.cramsan.minesweepers.common.ui.Assets
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-@OptIn(DelicateCoroutinesApi::class)
 class Game {
 
     private lateinit var random: Random
@@ -19,11 +21,11 @@ class Game {
         MutableStateFlow(GameState.NORMAL)
     )
     val gameStateHolder: GameStateHolder = _gameStateHolder
+
     private val _isGameReady = MutableStateFlow(false)
     val isGameReady = _isGameReady.asStateFlow()
 
     private var timerJob: Job? = null
-
     private var isRunning = false
 
     private var columns: Int = 0
@@ -52,7 +54,7 @@ class Game {
         _gameStateHolder.minesRemaining.value = mines
         _gameStateHolder.gameState.value = GameState.NORMAL
         _gameStateHolder.time.value = 0
-        updateState()
+        updateMapState()
     }
 
     fun loadAssets() {
@@ -71,7 +73,7 @@ class Game {
                 randomX = random.nextInt(columns)
                 randomY = random.nextInt(rows)
 
-                val mineAlreadyInPlace = _map[randomY][randomX].tileType == TileType.BOMB
+                val mineAlreadyInPlace = _map[randomY][randomX] is Tile.Bomb
                 val isInitialPosition = randomY == initialRow && randomX == initialColumn
 
                 val isPositionAvailable = !mineAlreadyInPlace && !isInitialPosition
@@ -105,7 +107,7 @@ class Game {
     private fun updateRiskFactor(column: Int, row: Int) {
         val tile = _map[row][column]
 
-        if (tile.tileType != TileType.EMPTY) {
+        if (tile !is Tile.Empty && tile !is Tile.Adjacent) {
             return
         }
 
@@ -118,7 +120,7 @@ class Game {
             _map.getOrNull(row + 1)?.getOrNull(column - 1),
             _map.getOrNull(row + 1)?.getOrNull(column),
             _map.getOrNull(row + 1)?.getOrNull(column + 1),
-        ).count { it.tileType == TileType.BOMB }
+        ).count { it is Tile.Bomb }
 
         if (adjacentBombs > 0) {
             _map[row][column] = Tile.Adjacent(adjacentBombs, TileCoverMode.COVERED)
@@ -204,7 +206,7 @@ class Game {
             }
         }
 
-        updateState()
+        updateMapState()
 
         if (remainingTiles == mines) {
             winGame()
@@ -237,10 +239,10 @@ class Game {
             is Tile.Bomb -> tile.copy(coverMode = nextCoverMode)
             is Tile.Empty -> tile.copy(coverMode = nextCoverMode)
         }
-        updateState()
+        updateMapState()
     }
 
-    private fun updateState() {
+    private fun updateMapState() {
         _gameStateHolder.map.value = _map.map {
             it.toList()
         }

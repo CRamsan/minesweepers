@@ -36,6 +36,10 @@ object Assets {
     private lateinit var _buttonPressed: ImageBitmap
     private lateinit var _buttonWon: ImageBitmap
     private lateinit var _buttonWorried: ImageBitmap
+    private lateinit var _arrowUp: ImageBitmap
+    private lateinit var _arrowDown: ImageBitmap
+    private lateinit var _arrowLeft: ImageBitmap
+    private lateinit var _arrowRight: ImageBitmap
 
     suspend fun loadAssets() {
         _lcdNumberDash = resource("dash.png").readBytes().toImageBitmap()
@@ -68,7 +72,10 @@ object Assets {
         _buttonPressed = resource("button_pressed.png").readBytes().toImageBitmap()
         _buttonWon = resource("button_won.png").readBytes().toImageBitmap()
         _buttonWorried = resource("button_worried.png").readBytes().toImageBitmap()
-
+        _arrowUp = resource("arrow_up.png").readBytes().toImageBitmap()
+        _arrowDown = resource("arrow_down.png").readBytes().toImageBitmap()
+        _arrowLeft = resource("arrow_left.png").readBytes().toImageBitmap()
+        _arrowRight = resource("arrow_right.png").readBytes().toImageBitmap()
     }
 
     internal fun lcdNumberDash() = _lcdNumberDash
@@ -101,4 +108,10 @@ object Assets {
     internal fun buttonPressed() = _buttonPressed
     internal fun buttonWon() = _buttonWon
     internal fun buttonWorried() = _buttonWorried
+    internal fun arrowUp() = _arrowUp
+    internal fun arrowDown() = _arrowDown
+    internal fun arrowLeft() = _arrowLeft
+    internal fun arrowRight() = _arrowRight
+
+
 }

@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 
@@ -23,10 +24,11 @@ internal actual fun TileButtonDrawable(
     Image(
         image,
         modifier = Modifier
-            .size(25.dp)
+            .size(Dimensions.TILE_SIZE)
             .combinedClickable(
                 onLongClick = { onTileSelectedSecondary() }
             ) { onTileSelected() },
         contentDescription = null,
+        filterQuality = FilterQuality.None,
     )
 }

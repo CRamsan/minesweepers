@@ -1,12 +1,10 @@
 package com.cramsan.minesweepers.common.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +33,7 @@ internal fun App(
         Row(
             modifier = Modifier
                 .wrapContentHeight()
+                .fillMaxWidth()
                 .background(Color(0xFFC6C6C6))
                 .border(3.dp, Color.Black)
                 .padding(Padding.SMALL)
@@ -49,30 +48,124 @@ internal fun App(
             Spacer(Modifier.weight(1f))
             timePlayed(time)
         }
+        val verticalScroll = rememberScrollState()
+        val horizontalScroll = rememberScrollState()
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .border(3.dp, Color.Black)
+                .padding(3.dp),
         ) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .border(3.dp, Color.Black)
+                    .fillMaxSize()
+                    .verticalScroll(verticalScroll)
+                    .horizontalScroll(horizontalScroll),
+                contentAlignment = Alignment.Center,
             ) {
-
-                map.forEachIndexed { rowIndex, row ->
-                    Row {
-                        row.forEachIndexed { columnIndex, tile ->
-                            TileButton(
-                                tile,
-                                columnIndex,
-                                rowIndex,
-                                onTileSelected,
-                                onTileSelectedSecondary
-                            )
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    map.forEachIndexed { rowIndex, row ->
+                        Row {
+                            row.forEachIndexed { columnIndex, tile ->
+                                TileButton(
+                                    tile,
+                                    columnIndex,
+                                    rowIndex,
+                                    onTileSelected,
+                                    onTileSelectedSecondary
+                                )
+                            }
                         }
                     }
                 }
             }
+            if (verticalScroll.value > (20 + (Dimensions.TILE_SIZE.value / 2))) {
+                Row (modifier = Modifier.align(Alignment.TopCenter)) {
+                    ArrowDownRow()
+                }
+            }
+            if (verticalScroll.value < verticalScroll.maxValue - (20 + (Dimensions.TILE_SIZE.value / 2))) {
+                Row (modifier = Modifier.align(Alignment.BottomCenter)) {
+                    ArrowUpRow()
+                }
+            }
+            if (horizontalScroll.value > (20 + (Dimensions.TILE_SIZE.value / 2))) {
+                Column(modifier = Modifier.align(Alignment.CenterStart)) {
+                    ArrowRightColumn()
+                }
+            }
+            if (horizontalScroll.value < horizontalScroll.maxValue - (20 + (Dimensions.TILE_SIZE.value / 2))) {
+                Column (modifier = Modifier.align(Alignment.CenterEnd)) {
+                    ArrowLeftColumn()
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun ArrowDownRow() {
+    repeat(3) {
+        Image(
+            Assets.arrowDown(),
+            contentDescription = "",
+            filterQuality = FilterQuality.None,
+            modifier = Modifier.size(
+                Dimensions.ARROW_H_WIDTH,
+                Dimensions.ARROW_H_HEIGHT
+            )
+                .padding(3.dp)
+        )
+    }
+}
+
+@Composable
+private fun ArrowUpRow() {
+    repeat(3) {
+        Image(
+            Assets.arrowUp(),
+            contentDescription = "",
+            filterQuality = FilterQuality.None,
+            modifier = Modifier.size(
+                Dimensions.ARROW_H_WIDTH,
+                Dimensions.ARROW_H_HEIGHT
+            )
+                .padding(3.dp)
+        )
+    }
+}
+
+@Composable
+private fun ArrowLeftColumn() {
+    repeat(3) {
+        Image(
+            Assets.arrowLeft(),
+            contentDescription = "",
+            filterQuality = FilterQuality.None,
+            modifier = Modifier.size(
+                Dimensions.ARROW_V_WIDTH,
+                Dimensions.ARROW_V_HEIGHT
+            )
+                .padding(3.dp)
+        )
+    }
+}
+
+@Composable
+private fun ArrowRightColumn() {
+    repeat(3) {
+        Image(
+            Assets.arrowRight(),
+            contentDescription = "",
+            filterQuality = FilterQuality.None,
+            modifier = Modifier.size(
+                Dimensions.ARROW_V_WIDTH,
+                Dimensions.ARROW_V_HEIGHT
+            )
+                .padding(3.dp)
+        )
     }
 }
 
@@ -105,7 +198,6 @@ internal fun ResetButton(
         faceButtonState
     }
 
-    println(coalescedState)
     Image(
         coalescedState.toImageBitmap(),
         contentDescription = "",
