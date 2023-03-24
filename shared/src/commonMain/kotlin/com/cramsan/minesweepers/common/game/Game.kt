@@ -34,9 +34,9 @@ class Game {
     private var firstSelection = true
 
     fun setParameters() {
-        this.columns = 15
-        this.rows = 15
-        this.mines = 25
+        this.columns = 25
+        this.rows = 25
+        this.mines = 20
         this.random = Random
 
         firstSelection = true

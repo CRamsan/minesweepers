@@ -1,21 +1,31 @@
 package com.cramsan.minesweepers.common.ui
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.cramsan.minesweepers.common.game.TileCoverMode
 import com.cramsan.minesweepers.common.game.Game
 import com.cramsan.minesweepers.common.game.Tile
+import com.cramsan.minesweepers.common.game.TileCoverMode
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import kotlin.math.min
 
 @Composable
 internal fun App(
@@ -30,6 +40,12 @@ internal fun App(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        var offsetX by remember { mutableStateOf(0f) }
+        var offsetY by remember { mutableStateOf(0f) }
+        var boxSize by remember { mutableStateOf(IntSize.Zero) }
+        var mapSize by remember { mutableStateOf(IntSize.Zero) }
+        var mapPos by remember { mutableStateOf(Offset.Zero) }
+
         Row(
             modifier = Modifier
                 .wrapContentHeight()
@@ -43,60 +59,102 @@ internal fun App(
 
             ResetButton(
                 gameState.toFaceButtonState(),
-            ) { onRestartSelected() }
+            ) {
+                offsetX = 0f
+                offsetY = 0f
+                onRestartSelected()
+            }
 
             Spacer(Modifier.weight(1f))
             timePlayed(time)
         }
-        val verticalScroll = rememberScrollState()
-        val horizontalScroll = rememberScrollState()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .border(3.dp, Color.Black)
-                .padding(3.dp),
+                .padding(3.dp)
+                .clipToBounds()
+                .onGloballyPositioned { coordinates ->
+                    boxSize = coordinates.size
+                },
+            contentAlignment = Alignment.Center,
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(verticalScroll)
-                    .horizontalScroll(horizontalScroll),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-                    map.forEachIndexed { rowIndex, row ->
-                        Row {
-                            row.forEachIndexed { columnIndex, tile ->
-                                TileButton(
-                                    tile,
-                                    columnIndex,
-                                    rowIndex,
-                                    onTileSelected,
-                                    onTileSelectedSecondary
-                                )
+                    .wrapContentSize(unbounded = true)
+                    .offset {
+                        IntOffset(
+                            x = (offsetX).toInt(),
+                            y = (offsetY).toInt(),
+                        )
+                    }
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDrag = { change: PointerInputChange, dragAmount: Offset ->
+                                change.consume()
+                                if (dragAmount.x > 0) {
+                                    if (mapPos.x < 0) {
+                                        offsetX += dragAmount.x
+                                    }
+                                } else {
+                                    if ((mapPos.x + mapSize.width) > (boxSize.width)) {
+                                        offsetX += dragAmount.x
+                                    }
+                                }
+
+                                if (dragAmount.y > 0) {
+                                    if (mapPos.y <  0) {
+                                        offsetY += dragAmount.y
+                                    }
+                                } else {
+                                    if ((mapPos.y + mapSize.height) > (boxSize.height)) {
+                                        offsetY += dragAmount.y
+                                    }
+                                }
                             }
+                        )
+                    }
+                    .onGloballyPositioned { coordinates ->
+                        mapSize = coordinates.size
+                        mapPos = coordinates.positionInParent()
+                    }
+            ) {
+                map.forEachIndexed { rowIndex, row ->
+                    Row(
+                        modifier = Modifier.wrapContentSize(unbounded = true)
+                    ) {
+                        row.forEachIndexed { columnIndex, tile ->
+                            TileButton(
+                                tile,
+                                columnIndex,
+                                rowIndex,
+                                onTileSelected,
+                                onTileSelectedSecondary
+                            )
                         }
                     }
                 }
             }
-            if (verticalScroll.value > (20 + (Dimensions.TILE_SIZE.value / 2))) {
+
+            val density = LocalDensity.current.density
+            if (mapPos.y < -(Dimensions.TILE_SIZE.value * density)) {
                 Row (modifier = Modifier.align(Alignment.TopCenter)) {
                     ArrowDownRow()
                 }
             }
-            if (verticalScroll.value < verticalScroll.maxValue - (20 + (Dimensions.TILE_SIZE.value / 2))) {
+            if (mapPos.y + mapSize.height > (boxSize.height + (Dimensions.TILE_SIZE.value * density))) {
                 Row (modifier = Modifier.align(Alignment.BottomCenter)) {
                     ArrowUpRow()
                 }
             }
-            if (horizontalScroll.value > (20 + (Dimensions.TILE_SIZE.value / 2))) {
-                Column(modifier = Modifier.align(Alignment.CenterStart)) {
+
+            if (mapPos.x < -(Dimensions.TILE_SIZE.value * density)) {
+                Column (modifier = Modifier.align(Alignment.CenterStart)) {
                     ArrowRightColumn()
                 }
             }
-            if (horizontalScroll.value < horizontalScroll.maxValue - (20 + (Dimensions.TILE_SIZE.value / 2))) {
+            if (mapPos.x + mapSize.width > (boxSize.width + (Dimensions.TILE_SIZE.value * density))) {
                 Column (modifier = Modifier.align(Alignment.CenterEnd)) {
                     ArrowLeftColumn()
                 }

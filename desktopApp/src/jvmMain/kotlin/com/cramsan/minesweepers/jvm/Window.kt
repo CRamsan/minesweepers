@@ -32,18 +32,16 @@ fun main() = application {
             undecorated = true,
             onCloseRequest = ::exitApplication,
         ) {
-            WindowDraggableArea {
-                Box {
-                    MainView(
-                        time,
-                        minesRemaining,
-                        map,
-                        gameState,
-                        { column, row -> game.selectPosition(column, row) },
-                        { column, row -> game.toggleTileAtPosition(column, row) },
-                        { game.setParameters() },
-                    )
-                }
+            Box {
+                MainView(
+                    time,
+                    minesRemaining,
+                    map,
+                    gameState,
+                    { column, row -> game.selectPosition(column, row) },
+                    { column, row -> game.toggleTileAtPosition(column, row) },
+                    { game.setParameters() },
+                )
             }
         }
     }
