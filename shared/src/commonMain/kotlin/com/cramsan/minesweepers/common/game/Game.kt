@@ -1,12 +1,9 @@
 package com.cramsan.minesweepers.common.game
 
 import com.cramsan.minesweepers.common.ui.Assets
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class Game {
@@ -14,33 +11,38 @@ class Game {
     private lateinit var random: Random
 
     private val _map: MutableList<MutableList<Tile>> = mutableListOf()
-    private val _gameStateHolder = MutableGameStateHolder(
+    private val _statusHolder = MutableGameStateHolder(
         MutableStateFlow(0),
         MutableStateFlow(0),
         MutableStateFlow(emptyList()),
-        MutableStateFlow(GameState.NORMAL)
+        MutableStateFlow(Status.NORMAL)
     )
-    val gameStateHolder: GameStateHolder = _gameStateHolder
+    val gameStateHolder: GameStateHolder = _statusHolder
 
-    private val _isGameReady = MutableStateFlow(false)
-    val isGameReady = _isGameReady.asStateFlow()
+    private val _initialized = MutableStateFlow(false)
+    val initialized = _initialized.asStateFlow()
 
     private var timerJob: Job? = null
-    private var isRunning = false
+    private var isGameRunning = false
 
     private var columns: Int = 0
     private var rows: Int = 0
     private var mines: Int = 0
     private var firstSelection = true
 
-    fun setParameters() {
-        this.columns = 25
-        this.rows = 25
-        this.mines = 20
+    fun configure(
+        columns: Int = 15,
+        rows: Int = 15,
+        mines: Int = 30,
+    ) {
+        this.columns = columns
+        this.rows = rows
+        this.mines = mines
+
         this.random = Random
 
         firstSelection = true
-        isRunning = false
+        isGameRunning = false
         timerJob?.cancel()
 
         _map.clear()
@@ -51,16 +53,18 @@ class Game {
             }
             _map.add(row)
         }
-        _gameStateHolder.minesRemaining.value = mines
-        _gameStateHolder.gameState.value = GameState.NORMAL
-        _gameStateHolder.time.value = 0
+        _statusHolder.minesRemaining.value = mines
+        _statusHolder.status.value = Status.NORMAL
+        _statusHolder.time.value = 0
         updateMapState()
     }
 
-    fun loadAssets() {
+    fun loadAssetsAsync() {
+        // This is not the right way to dispatch IO
+        // We should be injecting an IO dispatcher.
         GlobalScope.launch {
             Assets.loadAssets()
-            _isGameReady.value = true
+            _initialized.value = true
         }
     }
 
@@ -92,14 +96,14 @@ class Game {
         }
 
         firstSelection = false
-        isRunning = true
+        isGameRunning = true
 
         timerJob?.cancel()
         timerJob = GlobalScope.launch {
-            _gameStateHolder.time.value = 0
-            while (isRunning) {
+            _statusHolder.time.value = 0
+            while (isGameRunning) {
                 delay(1000)
-                _gameStateHolder.time.value++
+                _statusHolder.time.value++
             }
         }
     }
@@ -129,7 +133,7 @@ class Game {
 
     private fun loseGame(targetColumn: Int, targetRow: Int) {
         val userSelectionTile = _map[targetRow][targetColumn]
-        isRunning = false
+        isGameRunning = false
         timerJob?.cancel()
         repeat(rows) { row ->
             repeat(columns) { column ->
@@ -142,17 +146,17 @@ class Game {
                 }
             }
         }
-        _gameStateHolder.gameState.value = GameState.LOST
+        _statusHolder.status.value = Status.LOST
     }
 
     private fun winGame() {
-        isRunning = false
+        isGameRunning = false
         timerJob?.cancel()
-        _gameStateHolder.gameState.value = GameState.WON
-        _gameStateHolder.minesRemaining.value = 0
+        _statusHolder.status.value = Status.WON
+        _statusHolder.minesRemaining.value = 0
     }
 
-    private fun uncoverPosition(column: Int, row: Int) {
+    private fun uncoverTile(column: Int, row: Int) {
         val currentTile = _map.getOrNull(row)?.getOrNull(column) ?: return
 
         if (currentTile.coverMode == TileCoverMode.UNCOVERED) {
@@ -169,33 +173,29 @@ class Game {
             return
         }
 
-        uncoverPosition(column - 1, row -1)
-        uncoverPosition(column - 1, row)
-        uncoverPosition(column - 1, row + 1)
-        uncoverPosition(column, row - 1)
-        uncoverPosition(column, row + 1)
-        uncoverPosition(column + 1, row - 1)
-        uncoverPosition(column + 1, row)
-        uncoverPosition(column + 1, row + 1)
+        uncoverTile(column - 1, row -1)
+        uncoverTile(column - 1, row)
+        uncoverTile(column - 1, row + 1)
+        uncoverTile(column, row - 1)
+        uncoverTile(column, row + 1)
+        uncoverTile(column + 1, row - 1)
+        uncoverTile(column + 1, row)
+        uncoverTile(column + 1, row + 1)
     }
 
-    private fun handlePosition(column: Int, row: Int) {
-        when (_map[row][column]) {
-            is Tile.Bomb -> loseGame(column, row)
-            is Tile.Adjacent, is Tile.Empty -> uncoverPosition(column, row)
-        }
-    }
-
-    fun selectPosition(column: Int, row: Int) {
+    fun primaryAction(column: Int, row: Int) {
         if (firstSelection) {
             initializeMap(column, row)
         }
 
-        if (!isRunning) {
+        if (!isGameRunning) {
             return
         }
 
-        handlePosition(column, row)
+        when (_map[row][column]) {
+            is Tile.Bomb -> loseGame(column, row)
+            is Tile.Adjacent, is Tile.Empty -> uncoverTile(column, row)
+        }
 
         var remainingTiles = 0
         repeat(rows) { row ->
@@ -213,8 +213,8 @@ class Game {
         }
     }
 
-    fun toggleTileAtPosition(column: Int, row: Int) {
-        if (!isRunning) {
+    fun secondaryAction(column: Int, row: Int) {
+        if (!isGameRunning) {
             return
         }
 
@@ -226,12 +226,12 @@ class Game {
         }
 
         if (nextCoverMode == TileCoverMode.FLAGGED) {
-            if (_gameStateHolder.minesRemaining.value <= 0) {
+            if (_statusHolder.minesRemaining.value <= 0) {
                 return
             }
-            _gameStateHolder.minesRemaining.value--
+            _statusHolder.minesRemaining.value--
         } else {
-            _gameStateHolder.minesRemaining.value++
+            _statusHolder.minesRemaining.value++
         }
 
         _map[row][column] = when (tile) {
@@ -243,14 +243,8 @@ class Game {
     }
 
     private fun updateMapState() {
-        _gameStateHolder.map.value = _map.map {
+        _statusHolder.map.value = _map.map {
             it.toList()
         }
-    }
-
-    enum class GameState {
-        NORMAL,
-        WON,
-        LOST
     }
 }

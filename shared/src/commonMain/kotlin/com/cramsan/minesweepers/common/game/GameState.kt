@@ -7,12 +7,12 @@ interface GameStateHolder {
     val time: StateFlow<Int>
     val minesRemaining: StateFlow<Int>
     val map: StateFlow<List<List<Tile>>>
-    val gameState: StateFlow<Game.GameState>
+    val status: StateFlow<Status>
 }
 
 class MutableGameStateHolder(
     override val time: MutableStateFlow<Int>,
     override val minesRemaining: MutableStateFlow<Int>,
     override val map: MutableStateFlow<List<List<Tile>>>,
-    override val gameState: MutableStateFlow<Game.GameState>,
+    override val status: MutableStateFlow<Status>,
 ) : GameStateHolder

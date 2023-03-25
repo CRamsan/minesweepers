@@ -1,16 +1,13 @@
 package com.cramsan.minesweepers.common.ui
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerButton
-import androidx.compose.ui.unit.dp
+import com.cramsan.minesweepers.common.ui.theme.Dimensions
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

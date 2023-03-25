@@ -1,4 +1,4 @@
-package com.cramsan.minesweepers.common.ui
+package com.cramsan.minesweepers.common.ui.theme
 
 import androidx.compose.ui.unit.dp
 
@@ -19,6 +19,9 @@ object Dimensions {
 
 object Padding {
     val SMALL = 2.dp * ScaleFactor
+    val MEDIUM = 4.dp * ScaleFactor
+    val LARGE = 8.dp * ScaleFactor
+    val XLARGE = 16.dp * ScaleFactor
 }
 
 expect val ScaleFactor: Int
