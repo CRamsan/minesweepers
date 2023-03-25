@@ -28,29 +28,22 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Build Shared Library
+    - name: Build Project
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: "shared:build"
-    - name: Build Desktop
+        arguments: ":buildAll"
+    - name: Install Cocoapod Library
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: "desktopApp:build"
-    - name: Build Android
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: "android:build"
-    - name: Build Shared Library
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: "shared:podInstall"
+        arguments: ":shared:podInstall"
     - name: Set Default Scheme for iOS
       run: |
+        cd iosApp
         scheme_list=$(xcodebuild -list -json | tr -d "\n")
         default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
         echo $default | cat >default
         echo Using default scheme: $default
-    - name: Build
+    - name: Build iOS
       env:
         scheme: ${{ 'default' }}
         platform: ${{ 'iOS Simulator' }}

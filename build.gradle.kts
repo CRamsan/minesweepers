@@ -16,3 +16,10 @@ allprojects {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
+
+tasks.create("buildAll") {
+    dependsOn(":shared:build")
+    dependsOn(":desktopApp:build")
+    dependsOn(":androidApp:build")
+    dependsOn(":shared:podInstall")
+}
