@@ -1,8 +1,11 @@
-[![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+# Minesweeper in Compose Multiplatform
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-# [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) Application
 
 Use this template to start developing your own Compose Multiplatform application targeting desktop, Android, and iOS (experimental).
+
+[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) Application
+
 
 ## Desktop
 This template contains  `desktopApp` run configuration that you can use to run the desktop target in Android Studio or IntelliJ IDEA.
