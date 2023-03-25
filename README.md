@@ -6,6 +6,9 @@ Use this template to start developing your own Compose Multiplatform application
 
 [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) Application
 
+| Android                | Desktop | iOS |
+|------------------------|---------|-----|
+| ![](images/android.png | width=100)|![](images/desktop.png | width=200)|![](images/ios.png | width=100)|
 
 ## Desktop
 This template contains  `desktopApp` run configuration that you can use to run the desktop target in Android Studio or IntelliJ IDEA.
