@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.cramsan.minesweepers.common.MainView
-
 import com.cramsan.minesweepers.common.game.Game
 
 class MainActivity : AppCompatActivity() {

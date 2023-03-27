@@ -5,6 +5,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 version = "1.0-SNAPSHOT"

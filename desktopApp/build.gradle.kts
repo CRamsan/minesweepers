@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 kotlin {

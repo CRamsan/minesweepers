@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
+@Suppress("TooManyFunctions")
 object Assets {
     private lateinit var _lcdNumberDash: ImageBitmap
     private lateinit var _lcdNumberNone: ImageBitmap

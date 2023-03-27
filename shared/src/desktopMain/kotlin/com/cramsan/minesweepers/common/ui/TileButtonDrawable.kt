@@ -1,7 +1,10 @@
 package com.cramsan.minesweepers.common.ui
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality

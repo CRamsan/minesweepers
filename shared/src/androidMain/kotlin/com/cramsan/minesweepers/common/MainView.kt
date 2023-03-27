@@ -9,7 +9,8 @@ import com.cramsan.minesweepers.common.game.TileCoverMode
 import com.cramsan.minesweepers.common.ui.GameBar
 import com.cramsan.minesweepers.common.ui.GameMap
 
-@Composable fun MainView(
+@Composable
+fun MainView(
     time: Int,
     minesRemaining: Int,
     map: List<List<Tile>>,

@@ -8,6 +8,7 @@ import com.cramsan.minesweepers.common.game.Game
 import com.cramsan.minesweepers.common.ui.GameBar
 import com.cramsan.minesweepers.common.ui.GameMap
 
+@Suppress("FunctionNaming")
 fun MainViewController(game: Game) = ComposeUIViewController {
 
     val map by game.gameStateHolder.map.collectAsState()
