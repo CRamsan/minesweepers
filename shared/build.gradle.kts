@@ -5,6 +5,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 version = "1.0-SNAPSHOT"
@@ -12,7 +13,13 @@ version = "1.0-SNAPSHOT"
 kotlin {
     android()
 
-    jvm("desktop")
+    jvm("desktop") {
+        compilations.all {
+            compilerOptions.configure {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            }
+        }
+    }
 
     ios()
     iosSimulatorArm64()
@@ -23,7 +30,7 @@ kotlin {
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
         framework {
-            baseName = "shared"
+            baseName = "Shared"
             isStatic = true
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
@@ -41,9 +48,10 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.activity:activity-compose:1.6.1")
-                api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.9.0")
+                implementation(AndroidX.activity.compose)
+                implementation(AndroidX.appCompat)
+                implementation(AndroidX.core.ktx)
+                implementation(compose.desktop.common)
             }
         }
         val iosMain by getting
@@ -60,8 +68,7 @@ kotlin {
 
 android {
     compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
+
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
@@ -72,4 +79,5 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    namespace = "com.cramsan.minesweepers.common"
 }
