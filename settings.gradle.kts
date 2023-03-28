@@ -10,6 +10,8 @@ pluginManagement {
         val agpVersion = extra["agp.version"] as String
         val composeVersion = extra["compose.version"] as String
         val detektVersion = extra["detekt.version"] as String
+        val versionsVersion = extra["versions.version"] as String
+        val refreshVersion = extra["refresh.version"] as String
 
         kotlin("jvm").version(kotlinVersion)
         kotlin("multiplatform").version(kotlinVersion)
@@ -19,7 +21,13 @@ pluginManagement {
         id("com.android.library").version(agpVersion)
         id("org.jetbrains.compose").version(composeVersion)
         id("io.gitlab.arturbosch.detekt").version(detektVersion)
+        id("com.github.ben-manes.versions").version(versionsVersion)
+        id("de.fayard.refreshVersions").version(refreshVersion)
     }
+}
+
+plugins {
+    id("de.fayard.refreshVersions")
 }
 
 rootProject.name = "Minesweepers"

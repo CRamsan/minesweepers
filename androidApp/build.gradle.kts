@@ -12,9 +12,9 @@ kotlin {
             dependencies {
                 implementation(project(":shared"))
 
-                implementation("androidx.activity:activity-compose:1.6.1")
-                implementation("androidx.appcompat:appcompat:1.6.1")
-                implementation("androidx.core:core-ktx:1.9.0")
+                implementation(AndroidX.activity.compose)
+                implementation(AndroidX.appCompat)
+                implementation(AndroidX.core.ktx)
             }
         }
     }

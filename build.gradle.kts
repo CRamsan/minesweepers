@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
@@ -10,6 +11,7 @@ plugins {
     id("com.android.library") apply false
     id("org.jetbrains.compose") apply false
     id("io.gitlab.arturbosch.detekt")
+    id("com.github.ben-manes.versions")
 }
 
 allprojects {
@@ -25,4 +27,18 @@ tasks.create("buildAll") {
     dependsOn(":desktopApp:build")
     dependsOn(":androidApp:build")
     dependsOn(":shared:podInstall")
+}
+
+// From https://github.com/ben-manes/gradle-versions-plugin#rejectversionsif-and-componentselection
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
+
+tasks.withType<DependencyUpdatesTask> {
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
 }
