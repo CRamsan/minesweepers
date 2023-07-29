@@ -201,9 +201,9 @@ class Game {
         }
 
         var remainingTiles = 0
-        repeat(rows) { row ->
-            repeat(columns) { column ->
-                if (_map[row][column].coverMode != TileCoverMode.UNCOVERED) {
+        repeat(rows) { singleRow ->
+            repeat(columns) { singleColumn ->
+                if (_map[singleRow][singleColumn].coverMode != TileCoverMode.UNCOVERED) {
                     remainingTiles++
                 }
             }
