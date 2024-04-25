@@ -8,6 +8,9 @@ import com.cramsan.minesweepers.common.game.Game
 import com.cramsan.minesweepers.common.ui.GameBar
 import com.cramsan.minesweepers.common.ui.GameMap
 
+/**
+ * ViewController to expose the screen for the iOS platform.
+ */
 @Suppress("FunctionNaming")
 fun MainViewController(game: Game) = ComposeUIViewController {
 
@@ -15,16 +18,13 @@ fun MainViewController(game: Game) = ComposeUIViewController {
     val time by game.gameStateHolder.time.collectAsState()
     val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
     val status by game.gameStateHolder.status.collectAsState()
-    val isGameReady by game.initialized.collectAsState()
 
-    if (isGameReady) {
-        Column {
-            GameBar(time, minesRemaining, status) { game.configure() }
-            GameMap(
-                map,
-                { column, row -> game.primaryAction(column, row) },
-                { column, row -> game.secondaryAction(column, row) },
-            )
-        }
+    Column {
+        GameBar(time, minesRemaining, status) { game.configure() }
+        GameMap(
+            map,
+            { column, row -> game.primaryAction(column, row) },
+            { column, row -> game.secondaryAction(column, row) },
+        )
     }
 }

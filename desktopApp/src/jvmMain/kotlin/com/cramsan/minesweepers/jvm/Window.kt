@@ -9,29 +9,25 @@ import com.cramsan.minesweepers.common.game.Game
 
 fun main() = application {
     val game = Game()
-    game.loadAssetsAsync()
     game.configure()
 
-    val map by game.gameStateHolder.map.collectAsState()
-    val time by game.gameStateHolder.time.collectAsState()
-    val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
-    val gameState by game.gameStateHolder.status.collectAsState()
-    val isGameReady by game.initialized.collectAsState()
+    Window(
+        title = "Minesweepers",
+        onCloseRequest = ::exitApplication,
+    ) {
+        val map by game.gameStateHolder.map.collectAsState()
+        val time by game.gameStateHolder.time.collectAsState()
+        val minesRemaining by game.gameStateHolder.minesRemaining.collectAsState()
+        val gameState by game.gameStateHolder.status.collectAsState()
 
-    if (isGameReady) {
-        Window(
-            title = "Minesweepers",
-            onCloseRequest = ::exitApplication,
-        ) {
-            MainView(
-                time,
-                minesRemaining,
-                map,
-                gameState,
-                { column, row -> game.primaryAction(column, row) },
-                { column, row -> game.secondaryAction(column, row) },
-                { game.configure() },
-            )
-        }
+        MainView(
+            time,
+            minesRemaining,
+            map,
+            gameState,
+            { column, row -> game.primaryAction(column, row) },
+            { column, row -> game.secondaryAction(column, row) },
+            { game.configure() },
+        )
     }
 }

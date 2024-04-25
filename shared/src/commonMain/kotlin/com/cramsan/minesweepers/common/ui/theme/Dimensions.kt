@@ -2,6 +2,9 @@ package com.cramsan.minesweepers.common.ui.theme
 
 import androidx.compose.ui.unit.dp
 
+/**
+ *
+ */
 object Dimensions {
     val LCD_WIDTH = 13.dp * ScaleFactor
     val LCD_HEIGHT = 23.dp * ScaleFactor
@@ -17,6 +20,9 @@ object Dimensions {
     val ARROW_V_HEIGHT = 14.dp * ScaleFactor
 }
 
+/**
+ *
+ */
 object Padding {
     val SMALL = 2.dp * ScaleFactor
     val MEDIUM = 4.dp * ScaleFactor

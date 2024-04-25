@@ -3,6 +3,9 @@ package com.cramsan.minesweepers.common.game
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ *
+ */
 interface GameStateHolder {
     val time: StateFlow<Int>
     val minesRemaining: StateFlow<Int>
@@ -10,6 +13,9 @@ interface GameStateHolder {
     val status: StateFlow<Status>
 }
 
+/**
+ *
+ */
 class MutableGameStateHolder(
     override val time: MutableStateFlow<Int>,
     override val minesRemaining: MutableStateFlow<Int>,

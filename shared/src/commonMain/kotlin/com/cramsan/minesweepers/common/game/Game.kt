@@ -1,14 +1,16 @@
 package com.cramsan.minesweepers.common.game
 
-import com.cramsan.minesweepers.common.ui.Assets
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
+/**
+ *
+ */
 class Game {
 
     private lateinit var random: Random
@@ -22,9 +24,6 @@ class Game {
     )
     val gameStateHolder: GameStateHolder = _statusHolder
 
-    private val _initialized = MutableStateFlow(false)
-    val initialized = _initialized.asStateFlow()
-
     private var timerJob: Job? = null
     private var isGameRunning = false
 
@@ -33,6 +32,9 @@ class Game {
     private var mines: Int = 0
     private var firstSelection = true
 
+    /**
+     *
+     */
     fun configure(
         columns: Int = 15,
         rows: Int = 15,
@@ -62,15 +64,10 @@ class Game {
         updateMapState()
     }
 
-    fun loadAssetsAsync() {
-        // This is not the right way to dispatch IO
-        // We should be injecting an IO dispatcher.
-        GlobalScope.launch {
-            Assets.loadAssets()
-            _initialized.value = true
-        }
-    }
-
+    /**
+     *
+     */
+    @OptIn(DelicateCoroutinesApi::class)
     private fun initializeMap(initialColumn: Int, initialRow: Int) {
         repeat(mines) {
             var randomX: Int
@@ -166,9 +163,9 @@ class Game {
             return
         }
 
-        _map[row][column] = when(currentTile) {
+        _map[row][column] = when (currentTile) {
             is Tile.Bomb -> return
-            is Tile.Adjacent,  -> Tile.Adjacent(currentTile.risk, TileCoverMode.UNCOVERED)
+            is Tile.Adjacent, -> Tile.Adjacent(currentTile.risk, TileCoverMode.UNCOVERED)
             is Tile.Empty -> Tile.Empty(TileCoverMode.UNCOVERED)
         }
 
@@ -176,7 +173,7 @@ class Game {
             return
         }
 
-        uncoverTile(column - 1, row -1)
+        uncoverTile(column - 1, row - 1)
         uncoverTile(column - 1, row)
         uncoverTile(column - 1, row + 1)
         uncoverTile(column, row - 1)
@@ -186,6 +183,9 @@ class Game {
         uncoverTile(column + 1, row + 1)
     }
 
+    /**
+     *
+     */
     fun primaryAction(column: Int, row: Int) {
         if (firstSelection) {
             initializeMap(column, row)
@@ -201,9 +201,9 @@ class Game {
         }
 
         var remainingTiles = 0
-        repeat(rows) { singleRow ->
-            repeat(columns) { singleColumn ->
-                if (_map[singleRow][singleColumn].coverMode != TileCoverMode.UNCOVERED) {
+        repeat(rows) {
+            repeat(columns) { column ->
+                if (_map[it][column].coverMode != TileCoverMode.UNCOVERED) {
                     remainingTiles++
                 }
             }
@@ -216,6 +216,9 @@ class Game {
         }
     }
 
+    /**
+     *
+     */
     fun secondaryAction(column: Int, row: Int) {
         if (!isGameRunning) {
             return

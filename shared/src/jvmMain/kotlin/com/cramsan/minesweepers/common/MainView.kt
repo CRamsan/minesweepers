@@ -26,7 +26,10 @@ import com.cramsan.minesweepers.common.ui.GameMap
 @Preview
 @Composable
 fun AppPreview() {
-        MainView(20, 5, listOf(
+    MainView(
+        20,
+        5,
+        listOf(
             listOf(
                 Tile.Empty(TileCoverMode.COVERED),
                 Tile.Empty(TileCoverMode.UNCOVERED),
@@ -42,5 +45,10 @@ fun AppPreview() {
                 Tile.Adjacent(2, TileCoverMode.UNCOVERED),
                 Tile.Adjacent(3, TileCoverMode.COVERED)
             ),
-        ), Status.WON, { _, _ -> }, { _, _ -> }, {})
+        ),
+        Status.WON,
+        { _, _ -> },
+        { _, _ -> },
+        {}
+    )
 }

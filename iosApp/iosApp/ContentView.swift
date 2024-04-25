@@ -1,11 +1,10 @@
 import UIKit
 import SwiftUI
-import Shared
+import shared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         let game = Game()
-        game.loadAssetsAsync()
         game.configure(columns: 10, rows: 15, mines: 20)
         return GameViewControllerKt.MainViewController(game: game)
     }

@@ -43,7 +43,6 @@ To work with the iOS target you need:
 - [Xcode](https://developer.apple.com/xcode/) (to setup the environment)
 - [Android Studio](https://developer.android.com/studio)
 - [Kotlin Multiplatform Mobile plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile) (to work with all supported targets, including iOS)
-- [CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html)
 
 **Before opening the project in Android Studio**, make sure that your environment is set up for iOS and Kotlin Multiplatform development.
 Use [`kdoctor`](https://github.com/Kotlin/kdoctor) to ensure your development environment is configured correctly.

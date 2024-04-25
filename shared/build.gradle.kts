@@ -1,8 +1,9 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import de.fayard.refreshVersions.core.versionFor
+
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
     id("io.gitlab.arturbosch.detekt")
@@ -11,29 +12,23 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    androidTarget {
 
-    jvm("desktop") {
+    }
+
+    jvm {
         compilations.all {
             compilerOptions.configure {
-                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             }
         }
     }
 
-    ios()
-    iosSimulatorArm64()
-
-    cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "Shared"
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
@@ -46,19 +41,7 @@ kotlin {
                 implementation(compose.components.resources)
             }
         }
-        val androidMain by getting {
-            dependencies {
-                implementation(AndroidX.activity.compose)
-                implementation(AndroidX.appCompat)
-                implementation(AndroidX.core.ktx)
-                implementation(compose.desktop.common)
-            }
-        }
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val desktopMain by getting {
+        val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
             }
@@ -75,9 +58,41 @@ android {
         minSdk = 26
         targetSdk = 33
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = versionFor("version.androidx.compose.compiler")
+    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
     namespace = "com.cramsan.minesweepers.common"
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/**"
+        }
+    }
+}
+
+dependencies {
+    implementation(AndroidX.activity.compose)
+    implementation(AndroidX.appCompat)
+    implementation(AndroidX.core.ktx)
+
+    implementation(AndroidX.Compose.ui)
+    implementation(AndroidX.Compose.foundation)
+    implementation(AndroidX.Compose.ui.toolingPreview)
+    debugImplementation(AndroidX.Compose.ui.tooling)
+}
+
+compose.resources {
+    packageOfResClass = "shared"
 }
